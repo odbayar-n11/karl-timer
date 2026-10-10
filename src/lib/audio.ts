@@ -5,14 +5,15 @@
  */
 
 export type ChimeLevel = "soft" | "normal" | "high" | "final";
-export type SoundName = ChimeLevel | "tick";
+export type SoundName = ChimeLevel | "countdown";
 
 export const SOUND_FILES: Record<SoundName, string> = {
   soft: "/sounds/soft.wav", // 1 min passed (quiet)
   normal: "/sounds/normal.wav", // 1 min left
   high: "/sounds/high.wav", // 30 sec left
   final: "/sounds/final.wav", // time is up (loud, double strike)
-  tick: "/sounds/tick.wav", // last 5 seconds (not used by default)
+  // ONE file, exactly 5.00 s long, with the 5-4-3-2-1 ticks already inside it
+  countdown: "/sounds/countdown.wav",
 };
 
 // Phone vibration (Android only; iPhones ignore it). Milliseconds.
@@ -21,7 +22,8 @@ export const VIBRATION_PATTERNS: Record<SoundName, number | number[]> = {
   normal: 200,
   high: 200,
   final: [350, 120, 350, 120, 350],
-  tick: 40,
+  // five short pulses, one per second, matching the ticks
+  countdown: [80, 920, 80, 920, 80, 920, 80, 920, 80],
 };
 
 export const ALL_SOUNDS = Object.keys(SOUND_FILES) as SoundName[];

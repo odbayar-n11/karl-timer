@@ -48,9 +48,9 @@ export default function SoundTest({
     <div className="mt-8 rounded-2xl border border-[#720314]/20 bg-white p-6 shadow-sm">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-lg font-bold">Дохионы sound test</h2>
+          <h2 className="text-lg font-bold">Цагийн дохионы sound test</h2>
           <p className="text-sm text-[#720314]/80">
-            Дохио бүрийн дууг туршиж үзэх:
+            Цагийн дохиог тоглолт эхлэхээс өмнө тоглогчдод танилцуулах
           </p>
         </div>
 
@@ -70,21 +70,21 @@ export default function SoundTest({
           onClick={() => playChimeSequence(1, "soft")}
           className="rounded-xl border border-[#720314]/30 bg-[#720314]/10 p-3 text-xs font-bold hover:bg-[#720314]/20 transition"
         >
-          1 мин өнгөрсөн (1 удаа)
+          1 мин өнгөрсөн 
         </button>
 
         <button
           onClick={() => playChimeSequence(1, "normal")}
           className="rounded-xl border border-[#720314]/30 bg-[#720314]/10 p-3 text-xs font-bold hover:bg-[#720314]/20 transition"
         >
-          1 мин үлдсэн (1 удаа)
+          1 мин үлдсэн 
         </button>
 
         <button
           onClick={() => playChimeSequence(1, "high")}
           className="rounded-xl border border-[#720314]/30 bg-[#720314]/10 p-3 text-xs font-bold hover:bg-[#720314]/20 transition"
         >
-          30 сек үлдсэн (1 удаа)
+          30 сек үлдсэн 
         </button>
 
         <button
@@ -103,7 +103,7 @@ export default function SoundTest({
               : "hover:bg-red-500/20"
           }`}
         >
-          Сүүлийн 5 секунд (5, 4, 3, 2, 1)
+          Сүүлийн 5 секунд 
         </button>
       </div>
     </div>

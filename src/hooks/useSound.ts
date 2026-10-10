@@ -33,6 +33,7 @@ export function useSound(soundEnabled: boolean) {
     if (!audio) {
       audio = new Audio(SOUND_FILES[name]);
       audio.preload = "auto";
+      audio.load();
       audiosRef.current[name] = audio;
     }
     return audio;
@@ -103,15 +104,9 @@ export function useSound(soundEnabled: boolean) {
     }
   }
 
-  function playLoudTickSound(continuous: boolean = false) {
-    if (continuous) {
-      for (let i = 0; i < 5; i++) {
-        if (i === 0) playSound("tick");
-        else window.setTimeout(() => playSound("tick"), i * 1000);
-      }
-    } else {
-      playSound("tick");
-    }
+  // Plays the single 5-second countdown file (5-4-3-2-1 ticks inside it)
+  function playLoudTickSound() {
+    playSound("countdown");
   }
 
   return { playChimeSequence, playLoudTickSound };

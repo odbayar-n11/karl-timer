@@ -47,14 +47,14 @@ export default function MainTimer({
             onClick={onStart}
             className="rounded-2xl bg-[#720314] text-white px-12 py-5 text-xl font-bold hover:bg-[#5a0210] transition shadow-lg"
           >
-            ▶ Эхлүүлэх
+             Эхлүүлэх
           </button>
         ) : (
           <button
             onClick={onFinish}
             className="rounded-2xl bg-amber-600 text-white px-12 py-5 text-xl font-bold hover:bg-amber-700 transition shadow-lg"
           >
-            ⏭ Цаг дуусгах
+             Цаг дуусгах
           </button>
         )}
       </div>
@@ -62,7 +62,7 @@ export default function MainTimer({
       <div className="mt-6 text-sm text-[#720314]/60">
         {running
           ? "Цаг явж байна"
-          : "Эхлүүлэх товчийг дарж энэ үе шатыг эхлүүлнэ"}
+          : "Эхлүүлэх товчийг дарж цагийг эхлүүлнэ үү"}
       </div>
     </section>
   );

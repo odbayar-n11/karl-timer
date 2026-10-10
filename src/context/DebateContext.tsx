@@ -195,7 +195,7 @@ export function DebateProvider({ children }: { children: ReactNode }) {
       }
       // if several became due at once, play only the most important (last)
       if (due) {
-        if (due.level === "tick") playLoudTickSound(false);
+        if (due.level === "countdown") playLoudTickSound();
         else playChimeSequence(1, due.level);
       }
 

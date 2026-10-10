@@ -6,6 +6,7 @@ export default function SetupHeader() {
       </h1>
       <p className="mt-1 text-sm text-[#720314]/80 md:mt-2 md:text-base">
         Та аль цагийн форматаар тоглох вэ?
+
       </p>
     </div>
   );
