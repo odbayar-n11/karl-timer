@@ -3,12 +3,12 @@
 import { useDebate } from "@/context/DebateContext";
 import { useDebateGuard } from "@/hooks/useDebateGuard";
 import { useDebateNavigation } from "@/hooks/useDebateNavigation";
-import { TIME_SETTINGS } from "@/lib/constants";
+import { OPENING_PREP_SECONDS, TIME_SETTINGS } from "@/lib/constants";
 import DebateHeader from "@/components/debate/DebateHeader";
 import TeamBanners from "@/components/debate/TeamBanners";
 import MainTimer from "@/components/debate/MainTimer";
 import Timeline from "@/components/debate/Timeline";
-import PrepTime, { PrepTimer } from "@/components/debate/PrepTime";
+import PrepTime, { OpeningPrep, PrepTimer } from "@/components/debate/PrepTime";
 
 export default function DebatePage() {
   const {
@@ -27,7 +27,9 @@ export default function DebatePage() {
     prepUsed,
     prepTeam,
     prepRemaining,
+    openingPrepAvailable,
     startPrep,
+    startOpeningPrep,
     endPrep,
   } = useDebate();
   const { resetAndGoHome } = useDebateNavigation();
@@ -50,10 +52,26 @@ export default function DebatePage() {
         negativeName={displayNegative}
       />
 
+      {openingPrepAvailable && !prepTeam && (
+        <OpeningPrep
+          minutes={OPENING_PREP_SECONDS / 60}
+          onStart={startOpeningPrep}
+        />
+      )}
+
       {prepTeam ? (
         <PrepTimer
+          label={
+            prepTeam === "opening"
+              ? "Илтгэл бэлтгэх хугацаа"
+              : "Бэлтгэлийн хугацаа"
+          }
           teamName={
-            prepTeam === "affirmative" ? displayAffirmative : displayNegative
+            prepTeam === "opening"
+              ? "Хоёр баг"
+              : prepTeam === "affirmative"
+              ? displayAffirmative
+              : displayNegative
           }
           remaining={prepRemaining}
           onEnd={endPrep}

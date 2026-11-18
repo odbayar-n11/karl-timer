@@ -32,3 +32,6 @@ export const TIME_SETTINGS: Record<
 /** Бэлтгэлийн хугацаа: нэг удаад 1 минут, баг бүр 4 удаа авах эрхтэй. */
 export const PREP_TIME_SECONDS = 60;
 export const PREP_USES_PER_TEAM = 4;
+
+/** Мэтгэлцээн эхлэхээс өмнөх илтгэл бэлтгэх хугацаа (нэг удаа). */
+export const OPENING_PREP_SECONDS = 5 * 60;

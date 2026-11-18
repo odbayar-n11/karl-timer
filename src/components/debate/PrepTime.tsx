@@ -3,12 +3,13 @@
 import { formatTime } from "@/lib/format";
 import { PREP_USES_PER_TEAM } from "@/lib/constants";
 import type { Team } from "@/lib/types";
+import type { PrepOwner } from "@/context/DebateContext";
 
 interface Props {
   affirmativeName: string;
   negativeName: string;
   prepUsed: Record<Team, number>;
-  prepTeam: Team | null;
+  prepTeam: PrepOwner | null;
   /** a speech / cross-examination is running, so prep can't start */
   disabled: boolean;
   onStart: (team: Team) => void;
@@ -16,10 +17,12 @@ interface Props {
 
 /** Big timer shown in place of the main timer while a team is preparing. */
 export function PrepTimer({
+  label = "Бэлтгэлийн хугацаа",
   teamName,
   remaining,
   onEnd,
 }: {
+  label?: string;
   teamName: string;
   remaining: number;
   onEnd: () => void;
@@ -27,7 +30,7 @@ export function PrepTimer({
   return (
     <section className="rounded-3xl border-2 border-amber-500 bg-amber-50 p-8 text-center shadow-sm">
       <div className="text-sm font-bold uppercase tracking-widest text-amber-700">
-        Бэлтгэлийн хугацаа
+        {label}
       </div>
       <div className="mt-1 text-lg font-medium text-[#720314]/80">
         {teamName}
@@ -46,6 +49,34 @@ export function PrepTimer({
         className="rounded-2xl bg-amber-600 px-12 py-5 text-xl font-bold text-white shadow-lg transition hover:bg-amber-700"
       >
         Бэлтгэл дуусгах
+      </button>
+    </section>
+  );
+}
+
+/** The one-time 5-min prep before the first speech. */
+export function OpeningPrep({
+  minutes,
+  onStart,
+}: {
+  minutes: number;
+  onStart: () => void;
+}) {
+  return (
+    <section className="mb-6 flex flex-col items-start justify-between gap-4 rounded-2xl border-2 border-amber-500/60 bg-amber-50 p-5 shadow-sm md:flex-row md:items-center">
+      <div>
+        <div className="text-xs font-bold uppercase tracking-wider text-amber-700">
+          Мэтгэлцээн эхлэхээс өмнө
+        </div>
+        <div className="mt-1 text-lg font-semibold">
+          Илтгэл бэлтгэх хугацаа · {minutes} минут
+        </div>
+      </div>
+      <button
+        onClick={onStart}
+        className="shrink-0 rounded-xl bg-amber-600 px-5 py-3 font-semibold text-white shadow transition hover:bg-amber-700"
+      >
+        {minutes} мин бэлтгэл эхлүүлэх
       </button>
     </section>
   );
