@@ -188,10 +188,12 @@ export function DebateProvider({ children }: { children: ReactNode }) {
     startedAtRef.current = Date.now();
     currentRecordStartRef.current = new Date().toISOString();
 
-    cueScheduleRef.current = getCueSchedule(
-      currentPhase.duration,
-      currentPhase.type
-    );
+    const schedule = getCueSchedule(currentPhase.duration, currentPhase.type);
+    // shortened mode: cross-examination rings only when time is up
+    cueScheduleRef.current =
+      mode === "short" && currentPhase.type === "cross"
+        ? schedule.filter((cue) => cue.level === "final")
+        : schedule;
     cueIndexRef.current = 0;
 
     setRemaining(currentPhase.duration);

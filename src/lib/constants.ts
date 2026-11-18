@@ -13,7 +13,7 @@ export const TIME_SETTINGS: Record<
     label: "Богиносгосон цаг",
     first: 4 * 60,
     other: 3 * 60,
-    cross: 1 * 60,
+    cross: 2 * 60,
   },
   normal: {
     label: "Үндсэн цаг",
