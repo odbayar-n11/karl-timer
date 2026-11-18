@@ -15,7 +15,10 @@ import { groupResults, type GroupedResults } from "@/lib/results";
 import type { ChimeLevel } from "@/lib/audio";
 import { useSound } from "@/hooks/useSound";
 import { useWakeLock } from "@/hooks/useWakeLock";
-import type { Phase, TimeMode, TimeRecord } from "@/lib/types";
+import { PREP_TIME_SECONDS, PREP_USES_PER_TEAM } from "@/lib/constants";
+import type { Phase, Team, TimeMode, TimeRecord } from "@/lib/types";
+
+const NO_PREP_USED: Record<Team, number> = { affirmative: 0, negative: 0 };
 
 interface DebateContextValue {
   // setup
@@ -43,6 +46,13 @@ interface DebateContextValue {
   running: boolean;
   records: TimeRecord[];
   groupedResults: GroupedResults;
+
+  // prep time (1 min, PREP_USES_PER_TEAM times per team)
+  prepUsed: Record<Team, number>;
+  prepTeam: Team | null;
+  prepRemaining: number;
+  startPrep: (team: Team) => void;
+  endPrep: () => void;
 
   // actions
   startCompetition: () => void;
@@ -79,10 +89,17 @@ export function DebateProvider({ children }: { children: ReactNode }) {
   const cueScheduleRef = useRef<ScheduledCue[]>([]);
   const cueIndexRef = useRef(0);
 
+  const [prepUsed, setPrepUsed] = useState<Record<Team, number>>(NO_PREP_USED);
+  const [prepTeam, setPrepTeam] = useState<Team | null>(null);
+  const [prepRemaining, setPrepRemaining] = useState(PREP_TIME_SECONDS);
+  const prepStartedAtRef = useRef<number | null>(null);
+  const prepCueScheduleRef = useRef<ScheduledCue[]>([]);
+  const prepCueIndexRef = useRef(0);
+
   const { playChimeSequence, playLoudTickSound } = useSound(soundEnabled);
 
-  // keep the screen awake while a phase is running
-  useWakeLock(running);
+  // keep the screen awake while a phase or prep time is running
+  useWakeLock(running || prepTeam !== null);
 
   const currentPhase = phases[phaseIndex];
 
@@ -106,10 +123,40 @@ export function DebateProvider({ children }: { children: ReactNode }) {
     setFinished(false);
     setConfigured(true);
     setRunning(false);
+    clearPrep();
+    setPrepUsed(NO_PREP_USED);
+  }
+
+  function clearPrep() {
+    prepStartedAtRef.current = null;
+    prepCueScheduleRef.current = [];
+    setPrepTeam(null);
+    setPrepRemaining(PREP_TIME_SECONDS);
+  }
+
+  function startPrep(team: Team) {
+    if (running || prepTeam !== null) return;
+    if (prepUsed[team] >= PREP_USES_PER_TEAM) return;
+
+    prepStartedAtRef.current = Date.now();
+    // prep time: only the last-5-seconds countdown and the time-up sound
+    prepCueScheduleRef.current = getCueSchedule(
+      PREP_TIME_SECONDS,
+      "cross"
+    ).filter((cue) => cue.level === "countdown" || cue.level === "final");
+    prepCueIndexRef.current = 0;
+
+    setPrepUsed((prev) => ({ ...prev, [team]: prev[team] + 1 }));
+    setPrepRemaining(PREP_TIME_SECONDS);
+    setPrepTeam(team);
+  }
+
+  function endPrep() {
+    clearPrep();
   }
 
   function beginCurrentPhase() {
-    if (!currentPhase) return;
+    if (!currentPhase || prepTeam !== null) return;
 
     startedAtRef.current = Date.now();
     currentRecordStartRef.current = new Date().toISOString();
@@ -167,6 +214,8 @@ export function DebateProvider({ children }: { children: ReactNode }) {
     setPhaseIndex(0);
     setRemaining(0);
     setRecords([]);
+    clearPrep();
+    setPrepUsed(NO_PREP_USED);
     setAffirmativeName("");
     setNegativeName("");
   }
@@ -206,6 +255,41 @@ export function DebateProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, currentPhase]);
 
+  // Prep time tick: same cue logic as a phase; ends by itself when time is up.
+  useEffect(() => {
+    if (prepTeam === null || prepStartedAtRef.current === null) return;
+
+    const interval = window.setInterval(() => {
+      if (prepStartedAtRef.current === null) return;
+
+      const elapsed = (Date.now() - prepStartedAtRef.current) / 1000;
+
+      const schedule = prepCueScheduleRef.current;
+      let due: ScheduledCue | null = null;
+      while (
+        prepCueIndexRef.current < schedule.length &&
+        elapsed >= schedule[prepCueIndexRef.current].at
+      ) {
+        due = schedule[prepCueIndexRef.current];
+        prepCueIndexRef.current += 1;
+      }
+      if (due) {
+        if (due.level === "countdown") playLoudTickSound();
+        else playChimeSequence(1, due.level);
+      }
+
+      if (elapsed >= PREP_TIME_SECONDS) {
+        clearPrep();
+        return;
+      }
+
+      setPrepRemaining(PREP_TIME_SECONDS - elapsed);
+    }, 50);
+
+    return () => window.clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prepTeam]);
+
   const value: DebateContextValue = {
     mode,
     setMode,
@@ -227,6 +311,11 @@ export function DebateProvider({ children }: { children: ReactNode }) {
     running,
     records,
     groupedResults,
+    prepUsed,
+    prepTeam,
+    prepRemaining,
+    startPrep,
+    endPrep,
     startCompetition,
     beginCurrentPhase,
     finishCurrentPhase,

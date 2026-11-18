@@ -8,6 +8,7 @@ import DebateHeader from "@/components/debate/DebateHeader";
 import TeamBanners from "@/components/debate/TeamBanners";
 import MainTimer from "@/components/debate/MainTimer";
 import Timeline from "@/components/debate/Timeline";
+import PrepTime, { PrepTimer } from "@/components/debate/PrepTime";
 
 export default function DebatePage() {
   const {
@@ -23,6 +24,11 @@ export default function DebatePage() {
     beginCurrentPhase,
     finishCurrentPhase,
     playChimeSequence,
+    prepUsed,
+    prepTeam,
+    prepRemaining,
+    startPrep,
+    endPrep,
   } = useDebate();
   const { resetAndGoHome } = useDebateNavigation();
   const canRender = useDebateGuard("debate");
@@ -44,12 +50,31 @@ export default function DebatePage() {
         negativeName={displayNegative}
       />
 
-      <MainTimer
-        title={currentPhase?.title}
-        remaining={remaining}
-        running={running}
-        onStart={beginCurrentPhase}
-        onFinish={finishCurrentPhase}
+      {prepTeam ? (
+        <PrepTimer
+          teamName={
+            prepTeam === "affirmative" ? displayAffirmative : displayNegative
+          }
+          remaining={prepRemaining}
+          onEnd={endPrep}
+        />
+      ) : (
+        <MainTimer
+          title={currentPhase?.title}
+          remaining={remaining}
+          running={running}
+          onStart={beginCurrentPhase}
+          onFinish={finishCurrentPhase}
+        />
+      )}
+
+      <PrepTime
+        affirmativeName={displayAffirmative}
+        negativeName={displayNegative}
+        prepUsed={prepUsed}
+        prepTeam={prepTeam}
+        disabled={running}
+        onStart={startPrep}
       />
 
       <Timeline

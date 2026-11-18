@@ -28,3 +28,7 @@ export const TIME_SETTINGS: Record<
     cross: 2 * 60,
   },
 };
+
+/** Бэлтгэлийн хугацаа: нэг удаад 1 минут, баг бүр 4 удаа авах эрхтэй. */
+export const PREP_TIME_SECONDS = 60;
+export const PREP_USES_PER_TEAM = 4;
